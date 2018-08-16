@@ -13,7 +13,20 @@
     "database": "database_test",
     "host": "127.0.0.1",
     "dialect": "sqlite",
-    "storage": "db/memoryDb.sqlite"
+    "storage": "db/memoryDb.sqlite",
+    "define": {
+      "charset": "utf8",
+      "dialectOptions": {
+        "collate": "utf8_general_ci"
+      }
+    },
+    "operatorsAliases": false,
+    "logging": false,
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "idle": 10000
+    }
   },
   "production": {
     "username": "root",
@@ -21,6 +34,19 @@
     "database": "database_production",
     "host": "127.0.0.1",
     "dialect": "sqlite",
-    "storage": "db/memoryDb.sqlite"
+    "storage": "db/memoryDb.sqlite",
+    "define": {
+      "charset": "utf8",
+      "dialectOptions": {
+        "collate": "utf8_general_ci"
+      }
+    },
+    "operatorsAliases": false,
+    "logging": false,
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "idle": 10000
+    }
   }
 }
