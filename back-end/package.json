@@ -11,7 +11,10 @@
     "migrate": "node_modules/.bin/sequelize db:migrate",
     "migrate:undo": "node_modules/.bin/sequelize db:migrate:undo:all",
     "seed": "node_modules/.bin/sequelize db:seed:all",
-    "seed:undo": "node_modules/.bin/sequelize db:seed:undo:all"
+    "seed:undo": "node_modules/.bin/sequelize db:seed:undo:all",
+    "test": "NODE_ENV=test jest --forceExit --verbose --detectOpenHandles",
+    "test:unit": "npm test -- test/unit",
+    "test:watch": "npm test -- --watch"
   },
   "dependencies": {
     "@koa/cors": "2",
@@ -31,7 +34,16 @@
     "babel-plugin-root-import": "^5.1.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.2.0",
+    "eslint-config-kasa": "^0.1.0",
+    "jest": "^23.4.2",
+    "jest-junit": "^5.1.0",    
+    "supertest": "^3.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "repository": {
     "type": "git",
