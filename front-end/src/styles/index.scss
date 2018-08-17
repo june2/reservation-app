@@ -1,0 +1,45 @@
+// Bootstrap library
+@import 'bootstrap/scss/bootstrap';
+@import 'react-tabs/style/react-tabs.scss';
+// My Bootstrap configuration
+@import 'custom_bootstrap';
+@import 'calender';
+@import 'notification';
+@import 'popup';
+
+body {
+  margin: 0;
+  margin-left: 10%;
+  margin-right: 10%;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+// .App {
+//   text-align: center;
+// }
+
+// .App-logo {
+//   animation: App-logo-spin infinite 20s linear;
+//   height: 80px;
+// }
+
+// .App-header {
+//   background-color: #222;
+//   height: 150px;
+//   padding: 20px;
+//   color: white;
+// }
+
+// .App-title {
+//   font-size: 1.5em;
+// }
+
+// .App-intro {
+//   font-size: large;
+// }
+
+// @keyframes App-logo-spin {
+//   from { transform: rotate(0deg); }
+//   to { transform: rotate(360deg); }
+// }
