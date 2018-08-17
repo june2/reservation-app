@@ -7,6 +7,7 @@ const api = new Router(); // 라우터 분리
 
 api.get('/', roomCtrl.findAll);
 api.get('/:id', roomCtrl.findById);
+api.get('/:id/reservation', roomCtrl.findRoomReservation);
 api.post('/', roomCtrl.create);
 
 module.exports = api;

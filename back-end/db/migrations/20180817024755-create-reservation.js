@@ -8,7 +8,23 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      date: {
+      roomId: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      name: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
+      memo: {
+        type: Sequelize.STRING
+      },
+      startAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      endAt: {
+        allowNull: false,
         type: Sequelize.DATE
       },
       createdAt: {
