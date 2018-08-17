@@ -10,14 +10,8 @@ import api from '~../server/api';
 const env = process.env.NODE_ENV || 'development';
 const config = require('~../config/config.json')[env];
 const app = new Koa();
- 
-
-// Router
 const router = new Router();
-router.use('/api', api.routes());
-app.use(router.routes());
-app.use(router.allowedMethods());
-
+ 
 // Trust proxy
 app.proxy = true;
 
@@ -36,14 +30,17 @@ app.use(
     exposeHeaders: ['X-Request-Id']
   })
 );
-app.use(responseHandler());
+
+// res/res handler
+app.use(responseHandler({ contentType: 'application/json' }))
 app.use(errorHandler());
+
+// Bootstrap application router
+router.use('/api', api.routes());
+app.use(router.routes());
+app.use(router.allowedMethods());
 // app.use(requestId());
 // app.use(logMiddleware({ logger }));
-
-// // Bootstrap application router
-// app.use(router.routes());
-// app.use(router.allowedMethods());
 
 // Start server
 if (!module.parent) {

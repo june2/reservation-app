@@ -23,11 +23,11 @@ const statusCodes = {
 };
 
 function responseHandler() {
-  return async (ctx, next) => {
+  return async (ctx, next) => {    
     ctx.res.statusCodes = statusCodes;
     ctx.statusCodes = ctx.res.statusCodes;
 
-    ctx.res.success = ({ statusCode, data = null, message = null }) => {
+    ctx.res.success = ({ statusCode, data = null }) => {
       const status = 'success';
 
       if (!!statusCode && (statusCode < 400))
@@ -35,7 +35,7 @@ function responseHandler() {
       else if (!(ctx.status < 400))
         ctx.status = statusCodes.OK;
 
-      ctx.body = { status, data, message };
+      ctx.body = { status, data };
     };
 
     ctx.res.fail = ({ statusCode, code, data = null, message = null }) => {
