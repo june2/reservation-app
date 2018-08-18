@@ -38,7 +38,10 @@ const customStyles = {
 class Calendar extends Component {
   constructor(props, context) {
     super(props, context);
-    this.setDefault();
+    this.setDefault(); // set min/max time configration   
+    this.openModal = this.openModal.bind(this);
+    this.afterOpenModal = this.afterOpenModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
     this.state = {
       events: [],
       roomId: null,
@@ -48,9 +51,6 @@ class Calendar extends Component {
       count: 1,
       modalIsOpen: false
     };
-    this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
   }
   componentDidMount() {
     this.props.onRef(this)
@@ -66,7 +66,6 @@ class Calendar extends Component {
   closeModal() {
     this.setState({ modalIsOpen: false });
   }
-  // set min/max time
   setDefault() {
     BigCalendar.momentLocalizer(Moment); // or globalizeLocalizer
     this.minTime = new Date();
@@ -74,9 +73,18 @@ class Calendar extends Component {
     this.maxTime = new Date();
     this.maxTime.setHours(19, 30, 0);
   }
-  setEvents(roomId, roomName) {
-    RoomApi.findReservations(roomId)
+  setEvents(roomId, roomName, date) {
+    if (!date) {
+      date = Moment().format('YYYY-MM-DD')
+    }
+    // 날짜 조회 범위 계산 (주단위)
+    let today = Moment(date).day();
+    let begin = Moment(date).subtract(today, 'days').format('YYYY-MM-DD');
+    let last = Moment(begin).add(7, 'days').format('YYYY-MM-DD');
+    let params = { begin: begin, last: last };
+    RoomApi.findReservations(roomId, params)
       .then(res => {
+        // calender event data format으로 변경
         let events = res.data.data.map((o) => {
           return { id: o.id, start: DateUtil.localdateTime(o.start), end: DateUtil.localdateTime(o.end), title: o.title };
         });
@@ -93,7 +101,7 @@ class Calendar extends Component {
       count: count
     };
     RoomApi.createReservations(roomId, data)
-      .then(res => {        
+      .then(res => {
         this.setEvents(this.state.roomId, this.state.roomName);
         NotificationManager.info(`${startAt} ~ ${endAt} 예약 되었습니다.`);
         this.closeModal();
@@ -124,7 +132,7 @@ class Calendar extends Component {
             this.openModal(slotInfo.start, slotInfo.end)
           }
           onNavigate={date =>
-            NotificationManager.info(`action: ${date}`)
+            this.setEvents(this.state.roomId, this.state.roomName, date)
           }
         />
         <Modal

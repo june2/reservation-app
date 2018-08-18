@@ -69,7 +69,7 @@ describe('Home', () => {
   describe('GET /api/rooms/{id}/reservations', () => {
     it('<200> 룸 별 예약 조회', async () => {
       const res = await request
-        .get('/api/rooms/1/reservations')
+        .get('/api/rooms/1/reservations?begin=2018-08-01&end=2018-08-17')
         .expect('Content-Type', /json/)
         .expect(200);
 
@@ -77,6 +77,19 @@ describe('Home', () => {
       const expected = ['id', 'start', 'end', 'title'];
       expect(status).toBe('success');
       expect(Object.keys(data[0])).toEqual(expect.arrayContaining(expected));
+    });
+  });
+
+  describe('GET /api/rooms/{id}/reservations', () => {
+    it('<200> 룸 별 예약 조회 기간 필터', async () => {
+      const res = await request
+        .get('/api/rooms/1/reservations?begin=4000-10-01&end=4000-12-22')
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      const { status, data } = res.body;
+      expect(status).toBe('success');
+      expect(data.length).toEqual(0);
     });
   });
 });
