@@ -42,10 +42,33 @@ exports.findById = async (ctx, next) => {
   }
 };
 
+exports.createRoomReservation = async (ctx, next) => {
+  try {
+    let roomId = ctx.params.id;
+    let startAt = ctx.request.body.startAt;
+    let endAt = ctx.request.body.endAt;
+    if (!startAt) {
+      return ctx.res.unprocessableEntity({ data: 'error', message: 'startAt cannot be blank' });
+    }
+    if (!endAt) {
+      return ctx.res.unprocessableEntity({ data: 'error', message: 'endAt cannot be blank' });
+    }
+    let data = {     
+      roomId: roomId, startAt: startAt, endAt: endAt
+    }
+    let reservation = await models.reservation.create(data);
+    data.id = reservation.id;
+    return ctx.res.created({ data: data, message: 'reservations is created' });
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};
+
 exports.findRoomReservation = async (ctx, next) => {
   try {
     let roomId = ctx.params.id;
     let reservations = await models.reservation.findAll({
+      attributes: ['id', 'startAt', 'endAt', 'memo'],
       where: {
         roomId: roomId
       }

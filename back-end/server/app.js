@@ -40,7 +40,6 @@ router.use('/api', api.routes());
 app.use(router.routes());
 app.use(router.allowedMethods());
 // app.use(requestId());
-// app.use(logMiddleware({ logger }));
 
 // Start server
 if (!module.parent) {

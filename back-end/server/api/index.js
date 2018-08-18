@@ -6,7 +6,8 @@ import room from './room';
 import reservation from './reservation';
 import pkginfo from '~.package.json';
 
-const api = new Router(); // 라우터 분리
+// 라우터 분리
+const api = new Router();
 
 let getApiInfo = ctx => {
   const data = {
