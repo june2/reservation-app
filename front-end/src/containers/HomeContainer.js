@@ -8,19 +8,23 @@ class Home extends Component {
     super(props, context);
     this.state = {
       rooms: [],
+      roomId: null
     };
   }
   componentDidMount() {
     RoomApi.findAll()
       .then(res => {
         this.setState({ rooms: res.data.data });
+        if (this.state.rooms.length > 0) { // 미팅 룸이 null이 아닌경우 첫번쨰 룸 예약정보 랜더링
+          this.changeRoom(this.state.rooms[0].id);
+        }
       })
       .catch(err => {
         console.log(err);
       });
   }
   changeRoom(id) {
-    this.calender.setEvents(id) // do stuff    
+    this.calender.setEvents(id);
   }
   render() {
     return (
@@ -34,7 +38,7 @@ class Home extends Component {
             );
           })}
         </div>
-        <Calender onRef={ref => (this.calender = ref)}/>
+        <Calender onRef={ref => (this.calender = ref)} />
       </div>
     );
   }

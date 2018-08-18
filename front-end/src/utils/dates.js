@@ -1,5 +1,7 @@
 /* eslint no-fallthrough: off */
+import global from './../config/global'
 import dateMath from 'date-arithmetic'
+import moment from 'moment-timezone'
 
 const MILLI = {
   seconds: 1000,
@@ -12,6 +14,10 @@ const MONTHS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
 let dates = {
   ...dateMath,
+
+  localdateTime(dateTime) {    
+    return new Date(moment.tz(new Date(dateTime), global.timezone));
+  },
 
   monthsInYear(year) {
     let date = new Date(year, 0, 1)
@@ -96,7 +102,7 @@ let dates = {
     if (unit === 'day') unit = 'date'
     return Math.abs(
       dates[unit](start, undefined, firstOfWeek) -
-        dates[unit](end, undefined, firstOfWeek)
+      dates[unit](end, undefined, firstOfWeek)
     )
   },
 
@@ -109,7 +115,7 @@ let dates = {
     return Math.round(
       Math.abs(
         +dates.startOf(dateA, unit) / MILLI[unit] -
-          +dates.startOf(dateB, unit) / MILLI[unit]
+        +dates.startOf(dateB, unit) / MILLI[unit]
       )
     )
   },

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import BigCalendar from 'react-big-calendar'
 import { NotificationContainer, NotificationManager } from 'react-notifications';
-import ReactDom from 'react-dom';
 import Popup from 'react-popup';
-import moment from 'moment'
-import * as ReservationApi from '../services/reservation';
+import Moment from 'moment';
+import DateUtil from '../utils/dates';
+import * as RoomApi from '../services/room';
 
 // let test = ReservationApi.findAll();
 
@@ -50,28 +50,23 @@ class Calendar extends Component {
   }
   // set min/max time
   setDefault() {
-    BigCalendar.momentLocalizer(moment); // or globalizeLocalizer
+    BigCalendar.momentLocalizer(Moment); // or globalizeLocalizer
     this.minTime = new Date();
     this.minTime.setHours(8, 0, 0);
     this.maxTime = new Date();
     this.maxTime.setHours(19, 30, 0);
   }
-  setEvents(roomId) {
-    ReservationApi.findAll()
+  setEvents(roomId) {    
+    RoomApi.findReservations(roomId)
       .then(res => {
-        this.setState({ events: res.data.data });
+        let events = res.data.data.map((o) => {
+          return { id: o.id, start: DateUtil.localdateTime(o.start), end: DateUtil.localdateTime(o.end), title: o.title };
+        });        
+        this.setState({ events: events });
       })
       .catch(err => {
         console.log(err);
       });
-    // let events = [
-    //   {
-    //     id: 13,
-    //     title: 'Multi-day Event',
-    //     start: new Date('2018-08-16 11:00:00'),
-    //     end: new Date('2018-08-16 13:00:00'),
-    //   }
-    // ];    
   }
   render() {
     return (
