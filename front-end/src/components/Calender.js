@@ -1,38 +1,39 @@
 import React, { Component } from 'react';
 import BigCalendar from 'react-big-calendar'
+import Modal from 'react-modal';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import Popup from 'react-popup';
 import Moment from 'moment';
 import DateUtil from '../utils/dates';
 import * as RoomApi from '../services/room';
 
-// let test = ReservationApi.findAll();
-
-let Timeslots = ({ localizer, events, minTime, maxTime }) => (
-  <BigCalendar
-    selectable
-    views={['week', 'day']}
-    events={events}
-    step={15}
-    min={minTime}
-    max={maxTime}
-    localizer={localizer}
-    defaultView={BigCalendar.Views.WEEK}
-    defaultDate={new Date()}
-    onSelectEvent={event => alert(event.title)}
-    onSelectSlot={slotInfo =>
-      // alert(
-      //   `selected slot: \n\nstart ${slotInfo.start.toLocaleString()} ` +
-      //   `\nend: ${slotInfo.end.toLocaleString()}` +
-      //   `\naction: ${slotInfo.action}`
-      // )
-      Popup.alert('I am alert, nice to meet you')
-    }
-    onNavigate={date =>
-      NotificationManager.info(`action: ${date}`)
-    }
-  />
-)
+const formats = {
+  timeGutterFormat: 'HH:mm',
+  eventTimeRangeFormat: ({
+    start,
+    end
+  }, culture, local) =>
+    local.format(start, 'HH:mm', culture) + '-' +
+    local.format(end, 'HH:mm', culture),
+  // dayFormat: 'MM-DD' + ' ' + '星期' + 'dd',
+  agendaTimeRangeFormat: ({
+    start,
+    end
+  }, culture, local) =>
+    local.format(start, 'HH:mm', culture) + '-' +
+    local.format(end, 'HH:mm', culture),
+  // agendaDateFormat: 'MM-DD' + ' ' + '星期' + 'dd',
+};
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)'
+  }
+};
 
 class Calendar extends Component {
   constructor(props, context) {
@@ -40,13 +41,30 @@ class Calendar extends Component {
     this.setDefault();
     this.state = {
       events: [],
+      roomId: null,
+      roomName: null,
+      startAt: null,
+      endAt: null,
+      count: 1,
+      modalIsOpen: false
     };
+    this.openModal = this.openModal.bind(this);
+    this.afterOpenModal = this.afterOpenModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
   }
   componentDidMount() {
     this.props.onRef(this)
   }
   componentWillUnmount() {
     this.props.onRef(undefined)
+  }
+  openModal(start, end) {
+    this.setState({ startAt: Moment(start).format('YYYY-MM-DD HH:mm'), endAt: Moment(end).format('YYYY-MM-DD HH:mm'), modalIsOpen: true });
+  }
+  afterOpenModal() {
+  }
+  closeModal() {
+    this.setState({ modalIsOpen: false });
   }
   // set min/max time
   setDefault() {
@@ -56,13 +74,29 @@ class Calendar extends Component {
     this.maxTime = new Date();
     this.maxTime.setHours(19, 30, 0);
   }
-  setEvents(roomId) {    
+  setEvents(roomId, roomName) {
     RoomApi.findReservations(roomId)
       .then(res => {
         let events = res.data.data.map((o) => {
           return { id: o.id, start: DateUtil.localdateTime(o.start), end: DateUtil.localdateTime(o.end), title: o.title };
-        });        
-        this.setState({ events: events });
+        });
+        this.setState({ roomId: roomId, roomName: roomName, events: events });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+  creatReservation(roomId, startAt, endAt, count) {
+    let data = {
+      startAt: startAt,
+      endAt: endAt,
+      count: count
+    };
+    RoomApi.createReservations(roomId, data)
+      .then(res => {        
+        this.setEvents(this.state.roomId, this.state.roomName);
+        NotificationManager.info(`${startAt} ~ ${endAt} 예약 되었습니다.`);
+        this.closeModal();
       })
       .catch(err => {
         console.log(err);
@@ -71,8 +105,45 @@ class Calendar extends Component {
   render() {
     return (
       <div>
-        <Timeslots events={this.state.events} minTime={this.minTime} maxTime={this.maxTime} />
         <NotificationContainer />
+        <BigCalendar
+          selectable
+          views={['week', 'day']}
+          events={this.state.events}
+          step={30}
+          timeslots={1}
+          min={this.minTime}
+          max={this.maxTime}
+          formats={formats}
+          defaultView={BigCalendar.Views.WEEK}
+          defaultDate={new Date()}
+          onSelectEvent={event =>
+            Popup.alert(`${event.start.toLocaleString('ko-KR')} ~ ${event.end.toLocaleString('ko-KR')}, ${event.title || ''}`)
+          }
+          onSelectSlot={slotInfo =>
+            this.openModal(slotInfo.start, slotInfo.end)
+          }
+          onNavigate={date =>
+            NotificationManager.info(`action: ${date}`)
+          }
+        />
+        <Modal
+          ariaHideApp={false}
+          isOpen={this.state.modalIsOpen}
+          onAfterOpen={this.afterOpenModal}
+          onRequestClose={this.closeModal}
+          style={customStyles}
+          contentLabel="Example Modal"
+        >
+          <div>room : {this.state.roomName}</div>
+          <div>start : {this.state.startAt}</div>
+          <div>end : {this.state.endAt}</div>
+          <div>count : {this.state.count}</div>
+          <div>
+            <button onClick={this.closeModal}>close</button>
+            <button onClick={(e) => this.creatReservation(this.state.roomId, this.state.startAt, this.state.endAt, this.state.count, e)}>ok</button>
+          </div>
+        </Modal>
         <Popup />
       </div>
     );

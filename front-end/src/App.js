@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Col } from 'reactstrap';
-import Calender from './components/Calender';
+import { Container } from 'reactstrap';
 import HomeContainer from './containers/HomeContainer';
 
 class App extends Component {

@@ -12,9 +12,8 @@
     "migrate:undo": "node_modules/.bin/sequelize db:migrate:undo:all",
     "seed": "node_modules/.bin/sequelize db:seed:all",
     "seed:undo": "node_modules/.bin/sequelize db:seed:undo:all",
-    "test": "NODE_ENV=test jest --forceExit --verbose --detectOpenHandles",
-    "test:unit": "npm test -- test/unit",
-    "test:watch": "npm test -- --watch"
+    "test": "NODE_ENV=test jest --forceExit --verbose --detectOpenHandles",    
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@koa/cors": "2",

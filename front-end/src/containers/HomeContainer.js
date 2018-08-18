@@ -16,15 +16,15 @@ class Home extends Component {
       .then(res => {
         this.setState({ rooms: res.data.data });
         if (this.state.rooms.length > 0) { // 미팅 룸이 null이 아닌경우 첫번쨰 룸 예약정보 랜더링
-          this.changeRoom(this.state.rooms[0].id);
+          this.changeRoom(this.state.rooms[0].id, this.state.rooms[0].name);
         }
       })
       .catch(err => {
         console.log(err);
       });
   }
-  changeRoom(id) {
-    this.calender.setEvents(id);
+  changeRoom(id, name) {
+    this.calender.setEvents(id, name);
   }
   render() {
     return (
@@ -33,7 +33,7 @@ class Home extends Component {
           {this.state.rooms.map((room, i) => {
             return (
               <span style={{ paddingRight: '20px' }} key={i}>
-                <Button color="danger" onClick={(e) => this.changeRoom(room.id, e)}>{room.name}</Button>
+                <Button color="danger" onClick={(e) => this.changeRoom(room.id, room.name, e)}>{room.name}</Button>
               </span>
             );
           })}
