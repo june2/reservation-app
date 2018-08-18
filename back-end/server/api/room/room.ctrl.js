@@ -1,8 +1,9 @@
 'use strict';
 
 import models from '~/db/models';
+import utils from '~/server/components/utils';
 
-exports.create = async (ctx, next) => {
+exports.create = async (ctx) => {
   try {
     let name = ctx.request.body.name;
     if (!name) {
@@ -17,7 +18,7 @@ exports.create = async (ctx, next) => {
   }
 };
 
-exports.findAll = async (ctx, next) => {
+exports.findAll = async (ctx) => {
   try {
     let room = await models.room.findAll({
       attributes: ['id', 'name']
@@ -28,7 +29,7 @@ exports.findAll = async (ctx, next) => {
   }
 };
 
-exports.findById = async (ctx, next) => {
+exports.findById = async (ctx) => {
   try {
     let id = ctx.params.id;
     let room = await models.room.findById(id);
@@ -42,33 +43,40 @@ exports.findById = async (ctx, next) => {
   }
 };
 
-exports.createRoomReservation = async (ctx, next) => {
+exports.createRoomReservation = async (ctx) => {
   try {
     let roomId = ctx.params.id;
-    let startAt = ctx.request.body.startAt;
-    let endAt = ctx.request.body.endAt;
+    let startAt = ctx.request.body.startAt; // 예약 시작
+    let endAt = ctx.request.body.endAt; // 예약 끝
+    let count = ctx.request.body.count || 1; // 예약 날짜 반복 횟수
+    let memo = ctx.request.body.memo || null;  // 예약 메모 
+    // validations
     if (!startAt) {
       return ctx.res.unprocessableEntity({ data: 'error', message: 'startAt cannot be blank' });
     }
     if (!endAt) {
       return ctx.res.unprocessableEntity({ data: 'error', message: 'endAt cannot be blank' });
     }
-    let data = {     
-      roomId: roomId, startAt: startAt, endAt: endAt
-    }
-    let reservation = await models.reservation.create(data);
-    data.id = reservation.id;
-    return ctx.res.created({ data: data, message: 'reservations is created' });
+    // 종료일이 시작일보다 클 경우, 30분 단위 예약 아닐시 error
+    // if (){
+    // return ctx.res.unprocessableEntity({ data: 'error', message: 'invaild datetime' });
+    // }    
+    let reservation = { roomId: roomId, startAt: startAt, endAt: endAt, memo: memo };
+    console.log('data', reservation);
+    let data = utils.generateDate(reservation, count);    
+    console.log('data', data);
+    let reservations = await models.reservation.bulkCreate(data);    
+    return ctx.res.created({ data: reservations, message: 'reservations is created' });
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
-exports.findRoomReservation = async (ctx, next) => {
+exports.findRoomReservation = async (ctx) => {
   try {
     let roomId = ctx.params.id;
     let reservations = await models.reservation.findAll({
-      attributes: ['id', 'startAt', 'endAt', 'memo'],
+      attributes: ['id', ['startAt', 'start'], ['endAt', 'end'], ['memo', 'title']],
       where: {
         roomId: roomId
       }

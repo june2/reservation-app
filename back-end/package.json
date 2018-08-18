@@ -23,6 +23,7 @@
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
     "koa2-swagger-ui": "^2.9.6",
+    "moment": "^2.22.2",
     "sequelize": "^4.37.6",
     "sequelize-cli": "^4.0.0",
     "sqlite3": "^4.0.2",
