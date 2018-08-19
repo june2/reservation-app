@@ -89,3 +89,29 @@ exports.findRoomReservation = async (ctx) => {
     ctx.throw(500, e);
   }
 };
+
+exports.checkRoomReservationTime = async (ctx) => {
+  try {
+    let roomId = ctx.params.id;
+    let begin = ctx.query.begin;
+    let last = ctx.query.last;
+    if (!begin) {
+      return ctx.res.unprocessableEntity({ data: 'error', message: 'begin date is needed' });
+    }
+    if (!last) {
+      return ctx.res.unprocessableEntity({ data: 'error', message: 'begin date is needed' });
+    }
+    // let day = utils.getDayRange(begin);    
+    let reservations = await models.reservation.findOne({
+      attributes: ['id', ['startAt', 'start']],
+      order: ['startAt'],
+      where: {
+        roomId: roomId,
+        startAt: { [Op.between]: [begin, last] }
+      }
+    });
+    return ctx.res.ok({ data: reservations });
+  } catch (e) {
+    ctx.throw(500, e);
+  }
+};

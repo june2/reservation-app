@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Button, Form, FormGroup, Label, FormText, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Col, Button, Form, FormGroup, Label, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import BigCalendar from 'react-big-calendar'
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import Popup from 'react-popup';
@@ -9,67 +9,41 @@ import * as RoomApi from '../services/room';
 
 const formats = {
   timeGutterFormat: 'HH:mm',
-  eventTimeRangeFormat: ({
-    start,
-    end
-  }, culture, local) =>
-    local.format(start, 'HH:mm', culture) + '-' +
-    local.format(end, 'HH:mm', culture),
-  // dayFormat: 'MM-DD' + ' ' + '星期' + 'dd',
-  agendaTimeRangeFormat: ({
-    start,
-    end
-  }, culture, local) =>
-    local.format(start, 'HH:mm', culture) + '-' +
-    local.format(end, 'HH:mm', culture),
-  // agendaDateFormat: 'MM-DD' + ' ' + '星期' + 'dd',
-};
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)'
-  }
+  eventTimeRangeFormat: ({ start, end }, culture, local) =>
+    local.format(start, 'HH:mm', culture) + '-' + local.format(end, 'HH:mm', culture),
+  // dayFormat: 'MM-DD' + ' ' + 'dd',
 };
 
 class Calendar extends Component {
   constructor(props, context) {
     super(props, context);
-    this.setDefault(); // set min/max time configration   
+    this.setDefault(); // 캘린더 component momentLocalizer 설정
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.state = {
-      events: [],
-      roomId: null,
-      roomName: null,
-      startAt: null,
-      endAt: null,
-      count: 1,
-      modalIsOpen: false,
+      events: [], // 달력 예약 이벤트 array      
+      slot: [],
+      roomId: null, // 미팅 룸 아이디
+      roomName: null, // 미팅 룸 이름
+      startAt: null, // 미팅 예약 시간 시작
+      endAt: null, // 미팅 예약 시간 종료
+      count: 1, // 미팅 예약 반복 횟수, default = 1      
       modal: false
     };
   }
   componentDidMount() {
-    this.props.onRef(this)
-  }
-  componentWillUnmount() {
-    this.props.onRef(undefined)
-  }
-  openModal(start, end) {
-    this.setState({ startAt: Moment(start).format('YYYY-MM-DD HH:mm'), endAt: Moment(end).format('YYYY-MM-DD HH:mm'), modal: true });
-  }
-  closeModal() {
-    this.setState({ modal: false });
-  }
-  setDefault() {
-    BigCalendar.momentLocalizer(Moment); // or globalizeLocalizer
+    this.props.onRef(this);
+    // 달력 예약 최소/최대 시간 설정
     this.minTime = new Date();
     this.minTime.setHours(8, 0, 0);
     this.maxTime = new Date();
     this.maxTime.setHours(19, 30, 0);
+  }
+  componentWillUnmount() {
+    this.props.onRef(undefined)
+  }
+  setDefault() {
+    BigCalendar.momentLocalizer(Moment); // or globalizeLocalizer 
   }
   setEvents(roomId, roomName, date) {
     if (!date) {
@@ -82,15 +56,44 @@ class Calendar extends Component {
     let params = { begin: begin, last: last };
     RoomApi.findReservations(roomId, params)
       .then(res => {
-        // calender event data format으로 변경
+        // calender event data format으로 변경, utc => kst 변경
         let events = res.data.data.map((o) => {
           return { id: o.id, start: DateUtil.localdateTime(o.start), end: DateUtil.localdateTime(o.end), title: o.title };
         });
         this.setState({ roomId: roomId, roomName: roomName, events: events });
       })
       .catch(err => {
-        console.log(err);
+        Popup.alert(`${err}`);
       });
+  }
+  openModal(start, end) {
+    // 예약 가능 시간 체크, 중복 예약 방지
+    let begin = Moment(start).utc().format('YYYY-MM-DD HH:mm:ss');
+    let last = Moment(Moment(start).format('YYYY-MM-DD 19:30:00')).utc().format('YYYY-MM-DD HH:mm:ss)');
+    let params = { begin: begin, last: last };
+    RoomApi.checkReservations(this.state.roomId, params)
+      .then(res => {
+        // 예약 가능 시간 타임슬롯 계산
+        let event = res.data.data;
+        let nextTime = Moment(start).format('YYYY-MM-DD 19:30:00'); // 당일 최대 예약 가능 시간
+        if (event) {
+          nextTime = DateUtil.localdateTime(event.start);
+        }
+        let min = Moment(start).valueOf();
+        let max = Moment(nextTime).valueOf();
+        let count = Math.round((max - min) / (3600000 / 2));
+        for (let i = 1; i <= count; i++) {
+          this.state.slot.push(i * 30);
+        };
+        this.setState({ startAt: Moment(start).format('YYYY-MM-DD HH:mm'), endAt: Moment(end).format('YYYY-MM-DD HH:mm'), modal: true });
+      })
+      .catch(err => {
+        Popup.alert(`${err}`);
+      });
+  }
+  closeModal() {
+    this.setState({ slot: [] });
+    this.setState({ modal: false });
   }
   creatReservation(roomId, startAt, endAt, count, memo) {
     let data = {
@@ -106,7 +109,7 @@ class Calendar extends Component {
         this.closeModal();
       })
       .catch(err => {
-        console.log(err);
+        Popup.alert(`${err}`);
       });
   }
   render() {
@@ -135,25 +138,21 @@ class Calendar extends Component {
           }
         />
         <div>
-          <Modal isOpen={this.state.modal} className={this.props.className}>
+          <Modal isOpen={this.state.modal} className='modal-dialog modal-lg'>          
             <ModalHeader>
-              <div>
-                Room : {this.state.roomName}
-              </div>
-              <div>
-                time : {this.state.startAt} ~ {this.state.endAt}
-              </div>
+              <div>예약 미팅룸 : {this.state.roomName}</div>
+              <div>예약  시간 : {this.state.startAt} ~ {this.state.endAt}</div>
             </ModalHeader>
             <ModalBody>
               <Form>
                 <FormGroup row>
-                  <Label for="exampleEmail" sm={2}>Start</Label>
+                  <Label for="exampleEmail" sm={2}>예약 시간</Label>
                   <Col sm={10}>
                     <Input value={this.state.startAt} disabled />
                   </Col>
                 </FormGroup>
                 <FormGroup row>
-                  <Label for="exampleSelect" sm={2}>End</Label>
+                  <Label for="exampleSelect" sm={2}>사용 시간(분)</Label>
                   <Col sm={10}>
                     <Input
                       type="select"
@@ -161,14 +160,14 @@ class Calendar extends Component {
                         let endAt = Moment(this.state.startAt).add(evt.target.value, 'minutes').format('YYYY-MM-DD HH:mm');
                         this.setState({ endAt: endAt })
                       }}>
-                      {[30, 60, 90].map((val, i) => {
+                      {this.state.slot.map((val, i) => {
                         return (<option key={i}>{val}</option>);
                       })}
                     </Input>
                   </Col>
                 </FormGroup>
                 <FormGroup row>
-                  <Label for="exampleSelect" sm={2}>Count</Label>
+                  <Label for="exampleSelect" sm={2}>반복 예약 수</Label>
                   <Col sm={10}>
                     <Input type="select" onChange={(evt) => this.setState({ count: evt.target.value })}>
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val, i) => {
@@ -178,7 +177,7 @@ class Calendar extends Component {
                   </Col>
                 </FormGroup>
                 <FormGroup row>
-                  <Label for="exampleText" sm={2}>Memo</Label>
+                  <Label for="exampleText" sm={2}>메모</Label>
                   <Col sm={10}>
                     <Input type="textarea" onChange={(evt) => this.setState({ memo: evt.target.value })} />
                   </Col>
@@ -186,8 +185,8 @@ class Calendar extends Component {
               </Form>
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" onClick={(e) => this.creatReservation(this.state.roomId, this.state.startAt, this.state.endAt, this.state.count, this.state.memo, e)}>Ok</Button>
-              <Button color="secondary" onClick={this.closeModal}>Cancel</Button>
+              <Button color="primary" onClick={(e) => this.creatReservation(this.state.roomId, this.state.startAt, this.state.endAt, this.state.count, this.state.memo, e)}>예약</Button>
+              <Button color="secondary" onClick={this.closeModal}>취소</Button>
             </ModalFooter>
           </Modal>
         </div>

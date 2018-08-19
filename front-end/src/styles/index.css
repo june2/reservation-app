@@ -6323,6 +6323,12 @@ a.text-dark:hover, a.text-dark:focus {
   .react-tabs__tab-panel--selected {
     display: block; }
 
+.rbc-allday-cell {
+  display: none; }
+
+.rbc-time-view .rbc-header {
+  border-bottom: none; }
+
 .rbc-btn {
   color: inherit;
   font: inherit;

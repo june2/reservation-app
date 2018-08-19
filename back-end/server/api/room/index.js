@@ -11,5 +11,6 @@ api.get('/:id', roomCtrl.findById); // 미팅룸 상세 조회
 
 api.post('/:id/reservations', roomCtrl.createRoomReservation); // 미팅룸 예약 생성
 api.get('/:id/reservations', roomCtrl.findRoomReservation); // 미팅룸 예약 조회
+api.get('/:id/reservations/check', roomCtrl.checkRoomReservationTime); // 미팅룸 가능 예약 시간 조회
 
 module.exports = api;
