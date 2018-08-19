@@ -7,8 +7,8 @@ import moment from 'moment';
  **/
 exports.generateDate = (data, count) => {
   try {
-    let arr = [];
-    for (let i = 0; i < count; i++) {
+    let arr = [];    
+    for (let i = 0; i < count; i++) {      
       arr.push({
         startAt: moment(data.startAt, 'YYYY-MM-D HH:mm:ss').add(i * 7, 'days'),
         endAt: moment(data.endAt, 'YYYY-MM-D HH:mm:ss').add(i * 7, 'days'),

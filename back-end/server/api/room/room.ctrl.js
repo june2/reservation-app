@@ -4,7 +4,6 @@ import models from '~/db/models';
 import utils from '~/server/components/utils';
 import { Op } from 'sequelize';
 
-
 exports.create = async (ctx) => {
   try {
     let name = ctx.request.body.name;
@@ -64,9 +63,7 @@ exports.createRoomReservation = async (ctx) => {
     // return ctx.res.unprocessableEntity({ data: 'error', message: 'invaild datetime' });
     // }    
     let reservation = { roomId: roomId, startAt: startAt, endAt: endAt, memo: memo };
-    console.log('data', reservation);
     let data = utils.generateDate(reservation, count);
-    console.log('data', data);
     let reservations = await models.reservation.bulkCreate(data);
     return ctx.res.created({ data: reservations, message: 'reservations is created' });
   } catch (e) {
@@ -79,13 +76,12 @@ exports.findRoomReservation = async (ctx) => {
     let roomId = ctx.params.id;
     let begin = ctx.query.begin || new Date();
     let last = ctx.query.last || new Date();
-    console.log(ctx.query);
     let reservations = await models.reservation.findAll({
       attributes: ['id', ['startAt', 'start'], ['endAt', 'end'], ['memo', 'title']],
       where: {
         roomId: roomId,
         startAt: { [Op.gte]: begin },
-        endAt: { [Op.lte]: last }        
+        endAt: { [Op.lte]: last }
       }
     });
     return ctx.res.ok({ data: reservations });

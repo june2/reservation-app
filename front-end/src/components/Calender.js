@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
+import { Col, Button, Form, FormGroup, Label, FormText, Input, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import BigCalendar from 'react-big-calendar'
-import Modal from 'react-modal';
 import { NotificationContainer, NotificationManager } from 'react-notifications';
 import Popup from 'react-popup';
 import Moment from 'moment';
@@ -40,7 +40,6 @@ class Calendar extends Component {
     super(props, context);
     this.setDefault(); // set min/max time configration   
     this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.state = {
       events: [],
@@ -49,7 +48,8 @@ class Calendar extends Component {
       startAt: null,
       endAt: null,
       count: 1,
-      modalIsOpen: false
+      modalIsOpen: false,
+      modal: false
     };
   }
   componentDidMount() {
@@ -59,12 +59,10 @@ class Calendar extends Component {
     this.props.onRef(undefined)
   }
   openModal(start, end) {
-    this.setState({ startAt: Moment(start).format('YYYY-MM-DD HH:mm'), endAt: Moment(end).format('YYYY-MM-DD HH:mm'), modalIsOpen: true });
-  }
-  afterOpenModal() {
+    this.setState({ startAt: Moment(start).format('YYYY-MM-DD HH:mm'), endAt: Moment(end).format('YYYY-MM-DD HH:mm'), modal: true });
   }
   closeModal() {
-    this.setState({ modalIsOpen: false });
+    this.setState({ modal: false });
   }
   setDefault() {
     BigCalendar.momentLocalizer(Moment); // or globalizeLocalizer
@@ -94,11 +92,12 @@ class Calendar extends Component {
         console.log(err);
       });
   }
-  creatReservation(roomId, startAt, endAt, count) {
+  creatReservation(roomId, startAt, endAt, count, memo) {
     let data = {
       startAt: startAt,
       endAt: endAt,
-      count: count
+      count: count,
+      memo: memo
     };
     RoomApi.createReservations(roomId, data)
       .then(res => {
@@ -135,23 +134,63 @@ class Calendar extends Component {
             this.setEvents(this.state.roomId, this.state.roomName, date)
           }
         />
-        <Modal
-          ariaHideApp={false}
-          isOpen={this.state.modalIsOpen}
-          onAfterOpen={this.afterOpenModal}
-          onRequestClose={this.closeModal}
-          style={customStyles}
-          contentLabel="Example Modal"
-        >
-          <div>room : {this.state.roomName}</div>
-          <div>start : {this.state.startAt}</div>
-          <div>end : {this.state.endAt}</div>
-          <div>count : {this.state.count}</div>
-          <div>
-            <button onClick={this.closeModal}>close</button>
-            <button onClick={(e) => this.creatReservation(this.state.roomId, this.state.startAt, this.state.endAt, this.state.count, e)}>ok</button>
-          </div>
-        </Modal>
+        <div>
+          <Modal isOpen={this.state.modal} className={this.props.className}>
+            <ModalHeader>
+              <div>
+                Room : {this.state.roomName}
+              </div>
+              <div>
+                time : {this.state.startAt} ~ {this.state.endAt}
+              </div>
+            </ModalHeader>
+            <ModalBody>
+              <Form>
+                <FormGroup row>
+                  <Label for="exampleEmail" sm={2}>Start</Label>
+                  <Col sm={10}>
+                    <Input value={this.state.startAt} disabled />
+                  </Col>
+                </FormGroup>
+                <FormGroup row>
+                  <Label for="exampleSelect" sm={2}>End</Label>
+                  <Col sm={10}>
+                    <Input
+                      type="select"
+                      onChange={(evt) => {
+                        let endAt = Moment(this.state.startAt).add(evt.target.value, 'minutes').format('YYYY-MM-DD HH:mm');
+                        this.setState({ endAt: endAt })
+                      }}>
+                      {[30, 60, 90].map((val, i) => {
+                        return (<option key={i}>{val}</option>);
+                      })}
+                    </Input>
+                  </Col>
+                </FormGroup>
+                <FormGroup row>
+                  <Label for="exampleSelect" sm={2}>Count</Label>
+                  <Col sm={10}>
+                    <Input type="select" onChange={(evt) => this.setState({ count: evt.target.value })}>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val, i) => {
+                        return (<option key={i}>{val}</option>);
+                      })}
+                    </Input>
+                  </Col>
+                </FormGroup>
+                <FormGroup row>
+                  <Label for="exampleText" sm={2}>Memo</Label>
+                  <Col sm={10}>
+                    <Input type="textarea" onChange={(evt) => this.setState({ memo: evt.target.value })} />
+                  </Col>
+                </FormGroup>
+              </Form>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={(e) => this.creatReservation(this.state.roomId, this.state.startAt, this.state.endAt, this.state.count, this.state.memo, e)}>Ok</Button>
+              <Button color="secondary" onClick={this.closeModal}>Cancel</Button>
+            </ModalFooter>
+          </Modal>
+        </div>
         <Popup />
       </div>
     );

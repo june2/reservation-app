@@ -10,7 +10,7 @@ module.exports = {
       },
       roomId: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       memo: {
         type: Sequelize.STRING

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button } from 'reactstrap';
+import { Button, Nav, NavItem, NavLink } from 'reactstrap';
 import Calender from './../components/Calender';
 import * as RoomApi from '../services/room';
 
@@ -28,16 +28,17 @@ class Home extends Component {
   }
   render() {
     return (
-      <div>
-        <div style={{ 'padding': '20px 0px 20px 0px' }}>
+      <div style={{ 'padding': '20px 0px 20px 0px' }}>
+        <Nav>
           {this.state.rooms.map((room, i) => {
             return (
-              <span style={{ paddingRight: '20px' }} key={i}>
-                <Button color="danger" onClick={(e) => this.changeRoom(room.id, room.name, e)}>{room.name}</Button>
-              </span>
+              <NavItem key={i}>
+                <NavLink href='#' onClick={(e) => this.changeRoom(room.id, room.name, e)} >{room.name}</NavLink>
+              </NavItem>
             );
           })}
-        </div>
+        </Nav>
+        <hr />
         <Calender onRef={ref => (this.calender = ref)} />
       </div>
     );
