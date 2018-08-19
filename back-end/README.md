@@ -1,6 +1,6 @@
-**Reservation app api** 
+## Reservation app server api
 
-This app include the following features:
+### This app include the following features:
 
 - Node.js
 - koa
@@ -12,7 +12,6 @@ This app include the following features:
 - nodemon
 - eslint
 
----
 
 ## Directory Layout
 

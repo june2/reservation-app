@@ -1,6 +1,6 @@
-**Reservation app** 
+## Reservation app front
 
-This app include the following features:
+### This app include the following features:
 
 - react.js
 - sass
@@ -9,7 +9,6 @@ This app include the following features:
 - axios
 - big-calendar
 
----
 
 ## Commands
 
