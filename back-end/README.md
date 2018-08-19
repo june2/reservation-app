@@ -59,7 +59,6 @@ $ yarn test:watch                     # Run unit test
 ### sequelize
 
 ```zsh
-# Build
 $ yarn create                         # Create db
 $ yarn drop                           # Drop db
 $ yarn migrate                        # Create tables
