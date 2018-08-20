@@ -5,8 +5,6 @@ import userCtrl from './user.ctrl';
 
 const api = new Router(); // 라우터 분리
 
-api.get('/', userCtrl.findAll);
-api.get('/:id', userCtrl.findById);
-api.post('/', userCtrl.create);
+api.post('/', userCtrl.create); // 사용자 생성
 
 module.exports = api;

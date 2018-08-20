@@ -20,26 +20,3 @@ exports.create = async (ctx, next) => {
     ctx.throw(500, e);
   }
 };
-
-exports.findAll = async (ctx, next) => {
-  try {
-    let user = await models.user.findAll();
-    return ctx.res.ok({ data: user });
-  } catch (e) {
-    ctx.throw(500, e);
-  }
-};
-
-exports.findById = async (ctx, next) => {
-  try {
-    let id = ctx.params.id;    
-    let user = await models.user.findById(id);
-    if (user) {
-      return ctx.res.ok({ data: user });
-    } else {
-      return ctx.res.notFound({ data: 'error', message: 'id not found' });
-    }    
-  } catch (e) {
-    ctx.throw(500, e);
-  }
-};

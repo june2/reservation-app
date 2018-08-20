@@ -59,9 +59,20 @@ exports.createRoomReservation = async (ctx) => {
       return ctx.res.unprocessableEntity({ data: 'error', message: 'endAt cannot be blank' });
     }
     // 종료일이 시작일보다 클 경우, 30분 단위 예약 아닐시 error
-    // if (){
-    // return ctx.res.unprocessableEntity({ data: 'error', message: 'invaild datetime' });
-    // }    
+    if (!utils.validateReservationDate(startAt, endAt)) {
+      return ctx.res.unprocessableEntity({ data: 'error', message: 'datetime is invaild' });
+    }
+    // 중복 예약 방지
+    let obj = await models.reservation.findOne({
+      attributes: ['id'],
+      where: {
+        roomId: roomId,
+        startAt: { [Op.between]: [utils.convertUtc(startAt), utils.convertUtc(endAt)] }
+      }
+    });    
+    if (obj) {
+      return ctx.res.forbidden({ data: 'error', message: 'The room is not available' });
+    }
     let reservation = { roomId: roomId, startAt: startAt, endAt: endAt, memo: memo };
     let data = utils.generateDate(reservation, count);
     let reservations = await models.reservation.bulkCreate(data);
@@ -100,9 +111,8 @@ exports.checkRoomReservationTime = async (ctx) => {
     }
     if (!last) {
       return ctx.res.unprocessableEntity({ data: 'error', message: 'begin date is needed' });
-    }
-    // let day = utils.getDayRange(begin);    
-    let reservations = await models.reservation.findOne({
+    }    
+    let reservation = await models.reservation.findOne({
       attributes: ['id', ['startAt', 'start']],
       order: ['startAt'],
       where: {
@@ -110,7 +120,7 @@ exports.checkRoomReservationTime = async (ctx) => {
         startAt: { [Op.between]: [begin, last] }
       }
     });
-    return ctx.res.ok({ data: reservations });
+    return ctx.res.ok({ data: reservation });
   } catch (e) {
     ctx.throw(500, e);
   }

@@ -4,7 +4,7 @@ const supertest = require('supertest');
 const moment = require('moment');
 const app = require('../server/app');
 
-describe('Home', () => {
+describe('API rooms', () => {
   const request = supertest(app.listen());
 
   describe('POST /api/rooms', () => {

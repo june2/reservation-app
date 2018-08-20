@@ -2,9 +2,11 @@
 
 import moment from 'moment';
 
-/**
- *	genrate date
- **/
+/** 
+ * @param {*} data 
+ * @param {*} count 
+ * count 수만큼 date 주별로 반복 생성
+ */
 exports.generateDate = (data, count) => {
   try {
     let arr = [];
@@ -22,18 +24,38 @@ exports.generateDate = (data, count) => {
   }
 };
 
-/**
- *	genrate date
- **/
-exports.getDayRange = (date) => {
+/** 
+ * @param {*} start 
+ * @param {*} end 
+ * 예약 날짜 유효성 검사
+ */
+exports.validateReservationDate = (start, end) => {
   try {
-    let day = {
-      start: moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD HH:mm:ss'),
-      end: null
-    };
-    let now = moment(date, 'YYYY-MM-DD');    
-    day.end = moment(now).add(1, 'days').format('YYYY-MM-DD HH:mm:ss');
-    return day;
+    const dateFormat = 'YYYY-MM-DD HH:mm';
+    if (!moment(start, dateFormat, true).isValid()) {
+      return false;
+    }
+    if (!moment(end, dateFormat, true).isValid()) {
+      return false;
+    }
+    // 30min = 60*30*1000
+    let diff = moment(end).valueOf() - moment(start).valueOf();
+    if (diff < 0 || (diff % 1800000 !== 0)) {
+      return false;
+    }
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+/** 
+ * @param {*} date 
+ * utc 시간으로 변환
+ */
+exports.convertUtc = (date) => {
+  try {    
+    return moment(date).utc().format('YYYY-MM-DD HH:mm');
   } catch (err) {
     throw err;
   }
