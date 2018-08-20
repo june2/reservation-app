@@ -1,6 +1,12 @@
 import winston from 'winston';
 import moment from 'moment';
+import fs from 'fs';
 require('winston-daily-rotate-file');
+
+const dir = 'logs'; // Create log folder 
+if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+}
 
 const transport_info = new (winston.transports.DailyRotateFile)({
   name: 'info',
