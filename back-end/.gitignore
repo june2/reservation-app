@@ -19,5 +19,5 @@ database.sqlite
 coverage
 node_modules
 npm-debug.log
-*temp-db*
-*logs*
+*.sqlite
+*.log
