@@ -18,6 +18,9 @@
 
 ## Live demo
 ![Alt text](https://user-images.githubusercontent.com/5827617/44310931-85c1ac00-a419-11e8-8b41-38f65ea702d7.gif)
+- [Online demo](http://13.76.166.152:3002/)
+- [front-end](https://github.com/june2/reservation-app/tree/master/front-end)
+- [back-end](https://github.com/june2/reservation-app/tree/master/back-end)
 
 
 ## 사용 기술
