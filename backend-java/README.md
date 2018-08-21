@@ -22,5 +22,5 @@ $ ./gradlew clean build
 ```zsh
 $ ./gradlew bootRun
 # Or run it as an executable jar:
-$ java -jar build/libs/spring-boot-boilerplate-0.1.0.jar
+$ java -jar build/libs/reservation-app-0.1.0.jar
 ```
