@@ -56,10 +56,13 @@ class Calendar extends Component {
     let params = { begin: begin, last: last };
     RoomApi.findReservations(roomId, params)
       .then(res => {
-        // calender event data format으로 변경, utc => kst 변경
-        let events = res.data.data.map((o) => {
-          return { id: o.id, start: DateUtil.localdateTime(o.start), end: DateUtil.localdateTime(o.end), title: o.title };
-        });
+        let events = [];
+        if(res.data.data){
+          // calender event data format으로 변경, utc => kst 변경
+          events = res.data.data.map((o) => {
+            return { id: o.id, start: DateUtil.localdateTime(o.start), end: DateUtil.localdateTime(o.end), title: o.title };
+          });
+        }
         this.setState({ roomId: roomId, roomName: roomName, events: events });
       })
       .catch(err => {
@@ -68,14 +71,14 @@ class Calendar extends Component {
   }
   openModal(start, end) {
     // 예약 가능 시간 체크, 중복 예약 방지
-    let begin = Moment(start).utc().format('YYYY-MM-DD HH:mm:ss');
-    let last = Moment(Moment(start).format('YYYY-MM-DD 19:30:00')).utc().format('YYYY-MM-DD HH:mm:ss)');
+    let begin = Moment(start).utc().format('YYYY-MM-DD HH:mm');
+    let last = Moment(Moment(start).format('YYYY-MM-DD 19:30')).utc().format('YYYY-MM-DD HH:mm');
     let params = { begin: begin, last: last };
     RoomApi.checkReservations(this.state.roomId, params)
       .then(res => {
         // 예약 가능 시간 타임슬롯 계산
         let event = res.data.data;
-        let nextTime = Moment(start).format('YYYY-MM-DD 19:30:00'); // 당일 최대 예약 가능 시간
+        let nextTime = Moment(start).format('YYYY-MM-DD 19:30'); // 당일 최대 예약 가능 시간
         if (event) {
           nextTime = DateUtil.localdateTime(event.start);
         }

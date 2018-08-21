@@ -1,4 +1,4 @@
-## Reservation app server api
+## Reservation app node server api
 
 ### This app include the following features:
 

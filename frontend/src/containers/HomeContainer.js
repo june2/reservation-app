@@ -16,9 +16,11 @@ class Home extends Component {
   componentDidMount() {
     RoomApi.findAll()
       .then(res => {
-        this.setState({ rooms: res.data.data });
-        if (this.state.rooms.length > 0) { // 미팅 룸이 null이 아닌경우 첫번쨰 룸 예약정보 랜더링
-          this.changeRoom(this.state.rooms[0].id, this.state.rooms[0].name);
+        if(res.data.data){
+          this.setState({ rooms: res.data.data });
+          if (this.state.rooms.length > 0) { // 미팅 룸이 null이 아닌경우 첫번쨰 룸 예약정보 랜더링
+            this.changeRoom(this.state.rooms[0].id, this.state.rooms[0].name);
+          }
         }
       })
       .catch(err => {

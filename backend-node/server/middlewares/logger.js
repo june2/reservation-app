@@ -16,7 +16,7 @@ const transport_info = new (winston.transports.DailyRotateFile)({
   level: process.env.ENV === 'development' ? 'debug' : 'info',
   json: false,
   timestamp: () => {
-    return moment().format('YYYY-MM-D HH:mm:ss');
+    return moment().format('YYYY-MM-DD HH:mm:ss');
   }
 });
 
@@ -28,7 +28,7 @@ const transport_error = new (winston.transports.DailyRotateFile)({
   level: 'error',
   json: false,
   timestamp: () => {
-    return moment().format('YYYY-MM-D HH:mm:ss');
+    return moment().format('YYYY-MM-DD HH:mm:ss');
   }
 });
 
