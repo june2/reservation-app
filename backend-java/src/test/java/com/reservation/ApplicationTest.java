@@ -11,6 +11,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashMap;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApplicationTest {
@@ -19,12 +21,12 @@ public class ApplicationTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void shouldGetMessage() {
-//        ResponseEntity<Message> response = restTemplate.getForEntity("/hello", Message.class);
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//        Message message = response.getBody();
-//        assertThat(message.getMessage()).isEqualTo("Hello, World!");
+    public void shouldGetApiInfo() {
+        ResponseEntity<HashMap> response = restTemplate.getForEntity("/api", HashMap.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        HashMap map = response.getBody();
+        assertThat(map.get("status")).isEqualTo("success");
     }
 
 }

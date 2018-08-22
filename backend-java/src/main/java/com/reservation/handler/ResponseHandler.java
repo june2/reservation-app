@@ -5,6 +5,10 @@ public class ResponseHandler{
 	private String status ;
 	private Object data;
 	
+	public ResponseHandler() {
+		super();
+	}
+
 	public ResponseHandler(String status, Object data) {
 		super();
 		this.status = status;
