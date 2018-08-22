@@ -19,19 +19,22 @@
 ## Live demo
 ![Alt text](https://user-images.githubusercontent.com/5827617/44310931-85c1ac00-a419-11e8-8b41-38f65ea702d7.gif)
 - [Online demo](http://13.76.166.152:3002/)
-- [front-end](https://github.com/june2/reservation-app/tree/master/front-end)
-- [back-end](https://github.com/june2/reservation-app/tree/master/back-end)
-
+- [frontend](https://github.com/june2/reservation-app/tree/master/front-end)
+- [backend (node)](https://github.com/june2/reservation-app/tree/master/backend-node)
+- [backend (java)](https://github.com/june2/reservation-app/tree/master/backend-java)
 
 ## 사용 기술
-- Back-end : Node.js
+- Back-end : Node.js, Java
 - Front-end : React.js
 
 
 ## 진행 사항
-- [x]  Server api 구축
-- [x]  Server unit test
-- [x]  Server data validation 
-- [x]  web ui/ux 웹화면 페이지 구현
+- [x]  Node Server api 구축
+- [x]  Node Server unit test
+- [x]  Node Server data validation 
+- [x]  Java Server api 구축
+- [ ]  Java Server unit test
+- [ ]  Java Server data validation 
+- [x]  front web ui/ux 웹화면 페이지 구현
 - [ ]  front unit test
 - [ ]  authorization 인증 구현
